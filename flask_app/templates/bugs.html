@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+    <!-- Bootstrap -->
+    <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css' rel='stylesheet' integrity='sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We' crossorigin='anonymous'>
+    <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js' integrity='sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj' crossorigin='anonymous'></script>
+
+</head>
+<body>
+    
+    {% include 'navbar.html' %}
+
+    <div class="container">
+        <!-- Header -->
+        <div class="row">
+            <div class="col">
+                <h1>Bugs</h1>
+            </div>
+            <hr>
+        </div>
+        
+        <!-- Bugs -->
+        <div class="row">
+            <div class="col">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Bug</th>
+                            <th>Title</th>
+                            <th>Created By</th>
+                            <th>Created At</th>
+                            <th>Updated By</th>
+                            <th>Updated At</th>
+                            <th>Update</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bug in bugs %}
+                        <tr>
+                            <td>
+                                {{ bug.id }}
+                            </td>
+                            <td>
+                                <a href="bug/{{bug.id}}">{{ bug.title }}</a>
+                            </td>
+                            <td>
+                                {{ bug.bug_user_first_name }} {{ bug.bug_user_last_name }}
+                            </td>
+                            <td>
+                                {{ bug.created_at }}
+                            </td>
+                            <td>
+                                {{ bug.update_user_first_name }} {{ bug.update_user_last_name }}
+                            </td>
+                            <td>
+                                {{ bug.update_created_at }}
+                            </td>
+                            <td>
+                                {{ bug.update_description }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

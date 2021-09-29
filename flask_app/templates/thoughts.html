@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+    <!-- Bootstrap -->
+    <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css' rel='stylesheet' integrity='sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We' crossorigin='anonymous'>
+    <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js' integrity='sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj' crossorigin='anonymous'></script>
+
+</head>
+<body>
+    
+    {% include 'navbar.html' %}
+
+    <div class="container p-5">
+        <!-- Header -->
+        <div class="row">
+            <div class="col">
+                <h1>Welcome {{user.first_name}}!</h1>
+            </div>
+            <div class="col d-flex justify-content-end align-self-center">
+                <a href="/logout" class="btn btn-outline-danger">Logout</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <!-- Form -->
+                <form action="/users/{{user.id}}/thought" method="POST" class="mt-5">
+                    <div class="row">
+                        <div class="col col-10">
+                            <input name="content" type="text" class="form-control mb-3" placeholder="Post a thought here">
+                        </div>
+                        <div class="col col-2">
+                            <button type="submit" class="btn btn-primary">Add Thought</button>
+                        </div>
+                        {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                            <div class="row">
+                                {% for message in messages %}
+                                    <p>{{message}}</p>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </form>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                <!-- For Loop -->
+                {% for thought in thoughts %}
+                    <div class="row bg-light border rounded-3 m-3 p-3">
+                        <div class="col col-2">
+                            <a href="/users/{{ thought.thinker.id }}" class="btn btn-outline-primary">{{ thought.thinker.first_name }} says:</a>
+                        </div>
+                        <div class="col col-10">
+                            <div class="row bg-white border rounded-3 p-3">
+                                {{ thought.content }}
+                            </div>
+                            <div class="row py-3 justify-content-between">
+                                <div class="col">
+                                    {% if thought.id in thoughts_user_liked %}
+                                        <a href="/thoughts/{{thought.id}}/dislike" class="btn btn-primary">
+                                            Unlike
+                                        </a>
+                                    {% else %}
+                                        <a href="/thoughts/{{thought.id}}/like" class="btn btn-primary">
+                                            Like
+                                        </a>
+                                    {% endif %}
+                                </div>
+                                <div class="col">
+                                    <p class="pl-5">{{ thought.users_who_liked |length}} likes</p>
+                                </div>
+                                <div class="col d-flex justify-content-end align-self-center">
+                                    {% if thought.user_id == user.id %}<a href="/thoughts/{{thought.id}}/delete" class="btn btn-danger">Delete</a>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+    </div>
+
+</body>
+</html>

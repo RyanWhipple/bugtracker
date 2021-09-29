@@ -1,0 +1,98 @@
+from flask import flash
+from flask_app.config.mysqlconnection import connectToMySQL
+
+class User:
+    def __init__(self, data):
+        self.id = data['id']
+        self.first_name = data['first_name']
+        self.last_name = data['last_name']
+        self.email = data['email']
+        self.password = data['password']
+        self.thoughts = []
+        self.likes  =   []
+
+
+    # Validate User
+    @staticmethod
+    def validate_registration(user, methods=["POST"]):
+        is_valid = True
+        if len(user['first_name']) < 2:
+            flash("First name must be at least 2 characters.")
+            is_valid = False
+        if len(user['last_name']) < 2:
+            flash("Last name must be at least 2 characters.")
+            is_valid = False
+        if len(user['email']) < 8:
+            flash("Email must be at least 8 characters.")
+            is_valid = False
+        if len(user['password']) < 8:
+            flash("Password must be at least 8 characters.")
+            is_valid = False
+        if user['password'] != user['password_confirm']:
+            flash("Password and Confirm Password do not match")
+            is_valid_ = False
+        if not any(char.isdigit() for char in user['password']):
+            flash("Password requires at least one digit 0-9")
+            is_valid = False
+        if not any(char.isupper() for char in user['password']):
+            flash("Password requires at least one upper case character A-Z")
+            is_valid = False
+
+        return is_valid
+
+
+    # Save User
+    @classmethod
+    def save(cls, data):
+        query = "INSERT INTO users (first_name, last_name, email, password) VALUES ( %(first_name)s, %(last_name)s, %(email)s, %(password)s ) "
+        print("returning from save()")
+        return connectToMySQL().query_db(query, data)
+
+
+    # Get User by ID
+    @classmethod
+    def get_by_id(cls, data):
+        query = "SELECT * FROM users WHERE id = %(id)s"
+        results = connectToMySQL().query_db(query, data)
+        print("returning from get_by_id()")
+        return results[0]
+
+
+    # Get User by Email
+    @classmethod
+    def get_by_email(cls, data):
+        print("running get_by_email()")
+        query = "SELECT * FROM users WHERE email = %(email)s;"
+        results = connectToMySQL().query_db(query,data)
+        print("results[0]:", results[0])
+        print("cls(results[0]):", cls(results[0]))
+        if len(results) < 1:
+            return False
+        return cls(results[0])
+
+
+    # Get One User and Their Thoughts
+    # This is used to determine whether or not to display the "Delete" button on route "/thoughts"
+    @classmethod
+    def get_one_user_with_thoughts(cls, data):
+        query="SELECT * FROM users LEFT JOIN thoughts ON users.id = thoughts.user_id WHERE users.id = %(id)s"
+        results=connectToMySQL().query_db(query, data)
+        print(results)
+        user = cls(results[0])
+        return user
+
+
+    @classmethod
+    def get_one_user_with_likes(cls, data):
+        query="SELECT * FROM users LEFT JOIN likes ON users.id = likes.user_id WHERE users.id = %(id)s"
+        results=connectToMySQL().query_db(query, data)
+        print(results)
+        user = cls(results[0])
+        for row_from_db in results:
+                likes = {
+                    'id':row_from_db['likes.id'],
+                    'user_id':row_from_db['user_id'],
+                    'thought_id':row_from_db['thought_id']
+                }
+                # user.likes.append(like.Like(likes))
+        return user
