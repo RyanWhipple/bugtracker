@@ -32,10 +32,10 @@
                         <tr>
                             <th>Bug</th>
                             <th>Title</th>
-                            <th>Created By</th>
                             <th>Created At</th>
-                            <th>Updated By</th>
+                            <th>Created By</th>
                             <th>Updated At</th>
+                            <th>Updated By</th>
                             <th>Update</th>
                         </tr>
                     </thead>
@@ -49,19 +49,31 @@
                                 <a href="bug/{{bug.id}}">{{ bug.title }}</a>
                             </td>
                             <td>
-                                {{ bug.bug_user_first_name }} {{ bug.bug_user_last_name }}
-                            </td>
-                            <td>
                                 {{ bug.created_at }}
                             </td>
                             <td>
-                                {{ bug.update_user_first_name }} {{ bug.update_user_last_name }}
+                                {{ bug.bug_user_first_name }} {{ bug.bug_user_last_name }}
                             </td>
                             <td>
-                                {{ bug.update_created_at }}
+                                {% if bug.update_created_at == None %}
+                                    -
+                                {% else %}
+                                    {{ bug.update_created_at }}
+                                {% endif %}
                             </td>
                             <td>
-                                {{ bug.update_description }}
+                                {% if bug.update_user_first_name == None %}
+                                    -
+                                {% else %}
+                                    {{ bug.update_user_first_name }} {{ bug.update_user_last_name }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if bug.update_description == None %}
+                                    -
+                                {% else %}
+                                    {{ bug.update_description }}
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}

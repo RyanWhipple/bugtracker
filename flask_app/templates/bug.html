@@ -36,14 +36,15 @@
                 <div class="row">
                     <div class="col">
                         <hr>
+                        <p><b>Description:</b> {{ bug.description }}</p>
                         <p><b>Reported By:</b> {{ bug.first_name }} {{ bug.last_name }}</p>
                         <p><b>Reported At:</b> {{ bug.created_at }}</p>
                         <p><b>Updated At:</b> {{ last_update.created_at }}</p>
                         <p class="mt-3"><b>Developers:</b></p>
                         <ul>
-                            <li>demo</li>
-                            <li>demo</li>
-                            <li>demo</li>
+                            {% for developer in developers %}
+                                <li>{{ developer.first_name }} {{ developer.last_name}}</li>
+                            {% endfor %}
                         </ul>
                     </div>
                 </div>

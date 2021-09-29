@@ -59,5 +59,8 @@ class Update:
     # Get Updates By "bug_id" with User Data
     @classmethod
     def get_updates_by_bug_id_with_user_data(cls, data):
-        query = "SELECT * FROM updates LEFT JOIN users ON users.id = updates.user_id WHERE bug_id = %(id)s"
+        query = "SELECT * FROM updates LEFT JOIN users ON users.id = updates.user_id WHERE bug_id = %(id)s ORDER BY created_at DESC"
         return connectToMySQL().query_db(query, data)
+
+    
+    # 

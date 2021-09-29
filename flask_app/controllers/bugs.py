@@ -3,7 +3,6 @@ from flask_app import app
 from flask_app.models.bug import Bug
 from flask_app.models.update import Update
 from flask_app.models.user import User
-from flask_app.models.thought import Thought
 
 # All Bugs Dashboard
 @app.route('/bugs')
@@ -66,6 +65,12 @@ def bug_view(bug_id):
         }
         updates = Update.get_updates_by_bug_id_with_user_data(data)
 
+        # Developers
+        data = {
+            'id'    : bug_id
+        }
+        developers = Bug.get_bug_by_id_with_developer_names(data)
+
         if len(updates) > 0:
             last_update = updates[0]
         else:
@@ -77,6 +82,7 @@ def bug_view(bug_id):
             bug             = bug,
             updates         = updates,
             last_update     = last_update,
+            developers      = developers,
         )
 
 # update a Bug

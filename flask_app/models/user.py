@@ -1,4 +1,4 @@
-from flask import flash
+from flask import flash, session
 from flask_app.config.mysqlconnection import connectToMySQL
 
 class User:
@@ -12,7 +12,7 @@ class User:
         self.likes  =   []
 
 
-    # Validate User
+    # Validate User Registration
     @staticmethod
     def validate_registration(user, methods=["POST"]):
         is_valid = True
@@ -41,6 +41,23 @@ class User:
         return is_valid
 
 
+    # Validate User Update
+    @staticmethod
+    def validate_update(user, methods=["POST"]):
+        is_valid = True
+        if len(user['first_name']) < 2:
+            flash("First name must be at least 2 characters.")
+            is_valid = False
+        if len(user['last_name']) < 2:
+            flash("Last name must be at least 2 characters.")
+            is_valid = False
+        if len(user['email']) < 8:
+            flash("Email must be at least 8 characters.")
+            is_valid = False
+
+        return is_valid
+
+
     # Save User
     @classmethod
     def save(cls, data):
@@ -49,9 +66,20 @@ class User:
         return connectToMySQL().query_db(query, data)
 
 
+    # Update User
+    @classmethod
+    def update(cls, data):
+        query = "UPDATE users SET first_name = %(first_name)s, last_name = %(last_name)s, email=%(email)s WHERE id = %(id)s "
+        print("returning from update()")
+        return connectToMySQL().query_db(query, data)
+
+
     # Get User by ID
     @classmethod
     def get_by_id(cls, data):
+        data = {
+            'id'    : session['user_id']
+        }
         query = "SELECT * FROM users WHERE id = %(id)s"
         results = connectToMySQL().query_db(query, data)
         print("returning from get_by_id()")
@@ -64,35 +92,6 @@ class User:
         print("running get_by_email()")
         query = "SELECT * FROM users WHERE email = %(email)s;"
         results = connectToMySQL().query_db(query,data)
-        print("results[0]:", results[0])
-        print("cls(results[0]):", cls(results[0]))
         if len(results) < 1:
             return False
         return cls(results[0])
-
-
-    # Get One User and Their Thoughts
-    # This is used to determine whether or not to display the "Delete" button on route "/thoughts"
-    @classmethod
-    def get_one_user_with_thoughts(cls, data):
-        query="SELECT * FROM users LEFT JOIN thoughts ON users.id = thoughts.user_id WHERE users.id = %(id)s"
-        results=connectToMySQL().query_db(query, data)
-        print(results)
-        user = cls(results[0])
-        return user
-
-
-    @classmethod
-    def get_one_user_with_likes(cls, data):
-        query="SELECT * FROM users LEFT JOIN likes ON users.id = likes.user_id WHERE users.id = %(id)s"
-        results=connectToMySQL().query_db(query, data)
-        print(results)
-        user = cls(results[0])
-        for row_from_db in results:
-                likes = {
-                    'id':row_from_db['likes.id'],
-                    'user_id':row_from_db['user_id'],
-                    'thought_id':row_from_db['thought_id']
-                }
-                # user.likes.append(like.Like(likes))
-        return user

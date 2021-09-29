@@ -1,7 +1,6 @@
 from flask import render_template, redirect, session, flash, request
 from flask_app import app
 from flask_app.models.user import User
-from flask_app.models.thought import Thought
 from flask_bcrypt import Bcrypt
 
 bcrypt = Bcrypt(app)
@@ -10,8 +9,10 @@ bcrypt = Bcrypt(app)
 @app.route('/')
 def home():
     if 'user_id' in session:
-        user    = session.user
+        print("user_id in session == True")
+        user    = session.user_id
     else:
+        print("user_id in session == False")
         user    = None
     return render_template('index.html', user=user)
 
@@ -33,7 +34,26 @@ def register():
 
     session['user_id'] = User.save(data)
     
-    return redirect("/thoughts")
+    return redirect("/bugs")
+
+
+# Update Account
+@app.route('/user/<int:user_id>/update', methods=['POST'])
+def update(user_id):
+    if not User.validate_update(request.form):
+        return redirect('/')
+
+    data = {
+        'id'            : session['user_id'],
+        'first_name'    : request.form['first_name'],
+        'last_name'     : request.form['last_name'],
+        'email'         : request.form['email'],
+    }
+
+    User.update(data)
+    
+    return redirect("/bugs")
+
 
 # Login
 @app.route('/login', methods=['POST'])
@@ -56,33 +76,19 @@ def logout():
     return redirect('/')
 
 
-# Display a User and All Their Thoughts
+# Display a User and All Their Bugs and Updates
 @app.route('/users/<int:user_id>')
 def user(user_id):
     if 'user_id' not in session:
         return redirect('/')
-    
-    # Send Logged In User to template for the greeting banner
+     
+    # Get User Data
     data = {
         'id'    :   session['user_id']
     }
-    logged_in_user = User.get_by_id(data)
-     
-    # Send User to template for the "thoughts" banner
-    data = {
-        'id'    :   user_id
-    }
     user = User.get_by_id(data)
-
-    # Send all Thoughts from the User to the template
-    data = {
-        'user_id'    :   user_id,
-    }
-    user_thoughts = Thought.get_user_thoughts(data)
 
     return render_template(
         'user.html',
-        logged_in_user=logged_in_user,
         user=user,
-        user_thoughts = user_thoughts
         )
