@@ -34,7 +34,8 @@ def bug_save():
     data = {
         'title'         : request.form['title'],
         'description'   : request.form['description'],
-        'user_id' : session['user_id'],
+        'user_id'       : session['user_id'],
+        'status'        : "Open",
     }
 
     Bug.add_bug(data)
@@ -76,6 +77,8 @@ def bug_view(bug_id):
         else:
             last_update = None
 
+        print("Developers:", developers)
+
         return render_template(
             'bug.html',
             user            = user,
@@ -93,6 +96,13 @@ def bug_update(bug_id):
     
     if not Update.validate_update(request.form):
         return redirect(f'/bug/{bug_id}')
+
+    if request.form.get('closeBug'):
+        print("Bug is closed!")
+        data = {
+            'id'    : bug_id
+        }
+        Bug.close(data)
 
     data = {
         'bug_id'        : bug_id,

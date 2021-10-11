@@ -9,6 +9,7 @@ class Bug:
         self.description        = data['description']
         self.user_id            = data['user_id']
         self.created_at         = data['created_at']
+        self.status             = data['status']
         self.updates            = []
         self.developers         = []
 
@@ -29,7 +30,7 @@ class Bug:
     # Add/Save a Bug
     @classmethod
     def add_bug(cls, data):
-        query = "INSERT INTO bugs (title, description, user_id, created_at) VALUES ( %(title)s, %(description)s, %(user_id)s, NOW() ) "
+        query = "INSERT INTO bugs (title, description, user_id, created_at, status) VALUES ( %(title)s, %(description)s, %(user_id)s, NOW(), %(status)s ) "
         return connectToMySQL().query_db(query, data)
 
 
@@ -66,4 +67,10 @@ class Bug:
     @classmethod
     def get_bug_by_id_with_developer_names(cls, data):
         query = "SELECT * FROM bugs LEFT JOIN(SELECT user_id as update_user_id, bug_id as update_bug_id FROM updates) as updates_join ON bugs.id = updates_join.update_bug_id LEFT JOIN(SELECT id, first_name, last_name FROM users) as users_join ON update_user_id = users_join.id WHERE bugs.id = %(id)s GROUP BY update_user_id"
+        return connectToMySQL().query_db(query, data)
+
+    # Close a bug
+    @classmethod
+    def close(cls, data):
+        query = "UPDATE bugs SET status = 'Closed' WHERE id = %(id)s "
         return connectToMySQL().query_db(query, data)

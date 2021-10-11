@@ -37,13 +37,17 @@
                     <div class="col">
                         <hr>
                         <p><b>Description:</b> {{ bug.description }}</p>
+                        <p><b>Status:</b> {{ bug.status }}</p>
                         <p><b>Reported By:</b> {{ bug.first_name }} {{ bug.last_name }}</p>
                         <p><b>Reported At:</b> {{ bug.created_at }}</p>
                         <p><b>Updated At:</b> {{ last_update.created_at }}</p>
                         <p class="mt-3"><b>Developers:</b></p>
                         <ul>
                             {% for developer in developers %}
-                                <li>{{ developer.first_name }} {{ developer.last_name}}</li>
+                                {% if developer.first_name == None %}
+                                {% else %}
+                                    <li>{{ developer.first_name }} {{ developer.last_name}}</li>
+                                {% endif %}
                             {% endfor %}
                         </ul>
                     </div>
@@ -56,7 +60,7 @@
                         <h2>Updates</h2>
                     </div>
                     <div class="col col-3">
-                        <button type="button" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#updateModal">Post an Update</button>
+                        <button type="button" class="btn btn-primary m-1" data-bs-toggle="modal" data-bs-target="#updateModal" {% if bug.status == "Closed" %}disabled{% endif %}>Post an Update</button>
                     </div>
                 </div>
                 <div class="row">
@@ -111,6 +115,12 @@
                     <div>
                         <label for="description" class="form-label">Update</label>
                         <input name="description" type="text" class="form-control mb-3" placeholder="">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" value="closed" id="closeBug" name="closeBug">
+                            <label class="form-check-label" for="closeBug">
+                              Close Bug
+                            </label>
+                          </div>
                     </div>
                     <button type="submit" class="btn btn-primary">Add Update</button>
                     {% with messages = get_flashed_messages() %}
